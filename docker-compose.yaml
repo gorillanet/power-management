@@ -1,0 +1,31 @@
+services:
+    app:
+      image: node:22.13.1
+      hostname: apiserver
+      working_dir: /usr/src/app
+      ports: 
+      - '3000:3000'
+      volumes:
+        - ./mqtt:/usr/src/app
+        - mqtt_node_modules:/usr/src/app/node_modules
+      environment:
+        TZ: Asia/Tokyo
+      command: >
+        bash -c "npm install &&
+        npm install nodemon -g &&
+        nodemon sydpower-run.js"
+#    mongodb:
+#      container_name: "mongodb"
+#      hostname: mongodb
+#      image: mongo
+#      restart: unless-stopped
+#      ports:
+#        - 27017:27017
+#      volumes:
+#        - ./db:/data/db
+#        - ./configdb:/data/configdb
+#      environment:
+#        MONGO_INITDB_ROOT_USERNAME: root
+#        MONGO_INITDB_ROOT_PASSWORD: pw12345
+volumes:
+  mqtt_node_modules:
