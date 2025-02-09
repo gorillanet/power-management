@@ -7,6 +7,13 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
+# Python
+__pycache__
+
+#mongo
+db/data
+db/configdb
+
 #Cred
 .env
 

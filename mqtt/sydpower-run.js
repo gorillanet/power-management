@@ -37,6 +37,20 @@ const API_DEVICES = "api-devs";
 const mqttHost = "ws://mqtt.sydpower.com:8083/mqtt";
 const clientId = "client_jp";
 const password = "helloyoujp";
+mongodb = require('mongodb')
+const assert = require('assert')
+const mongohost = "mongodb"
+const mongoport = "27017"
+const mongodbname = "data"
+
+const mongo_connect_url = "mongodb://" + mongohost + ":" + mongoport + "/";
+MongoClient = mongodb.MongoClient
+
+MongoClient.connect(mongo_connect_url, (err, db) => {
+    assert.equal(null, err)
+    console.log("Connected successfully to server")
+    db.close()
+})
 
 /**
  * Constructor with conf injection
@@ -54,6 +68,7 @@ SydpowerConnector.prototype.init = function () {
     this.devices = {};
     this.username = ID;
     this.password = PW;
+
 /*
     process.argv.slice(2).forEach(function (val, index, array) {
         if (index == 0) {
@@ -233,7 +248,6 @@ SydpowerConnector.prototype.getDeviceData = function (accessToken, devicesMacs, 
             that.devices[deviceMac].acChargingUpperLimit = e[67];
             that.devices[deviceMac].wholeMachineUnusedTime = e[68];
         }
-        console.table(that.devices);
     });
 
     that.mqttClient.on('error', function (error) {

@@ -1,31 +1,47 @@
 services:
-    app:
-      image: node:22.13.1
-      hostname: apiserver
-      working_dir: /usr/src/app
+    power_api_server:
+      build: ./mqtt/.
+      hostname: power_api_server
+      working_dir: /app
       ports: 
-      - '3000:3000'
+        - '3000:3000'
       volumes:
-        - ./mqtt:/usr/src/app
-        - mqtt_node_modules:/usr/src/app/node_modules
+        - ./mqtt/.:/app
+        - mqtt_node_modules:/app/node_modules
       environment:
         TZ: Asia/Tokyo
       command: >
-        bash -c "npm install &&
-        npm install nodemon -g &&
+        sh -c "npm install &&
         nodemon sydpower-run.js"
-#    mongodb:
-#      container_name: "mongodb"
-#      hostname: mongodb
-#      image: mongo
-#      restart: unless-stopped
-#      ports:
-#        - 27017:27017
-#      volumes:
-#        - ./db:/data/db
-#        - ./configdb:/data/configdb
-#      environment:
-#        MONGO_INITDB_ROOT_USERNAME: root
-#        MONGO_INITDB_ROOT_PASSWORD: pw12345
+      depends_on:
+        - "mongodb"
+    switchbot_api_server:
+      container_name: switchbot_api
+      build:
+        context: ./switchbot
+        dockerfile: Dockerfile
+      volumes:
+        - ./switchbot:/app
+      command: >
+        sh -c "python3 switchbot.py"
+    mongodb:
+      container_name: "mongodb"
+      hostname: mongodb
+      build:
+        context: ./db
+        dockerfile: Dockerfile
+      restart: unless-stopped
+      ports:
+        - 27017:27017
+      volumes:
+        - ./db/data:/data/db
+        - ./db/configdb:/data/configdb
+        - ./db/initdb.d:/docker-entrypoint-initdb.d
+    web:
+      image: nginx
+      volumes:
+        - ./nginx:/usr/share/nginx/html
+      ports: 
+        - '10088:80'
 volumes:
   mqtt_node_modules:
